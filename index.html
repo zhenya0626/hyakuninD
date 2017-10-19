@@ -40,15 +40,12 @@
 		var kimariji = ["あきの","はるす","あし","たご","おく","かさ","あまの","わがい","はなの","これ","わたのはらや","あまつ","つく","みちの","きみがためは","たち","ちは","す","なにはが","わび","いまこ","ふ","つき","この","なにし","をぐ","みかの","やまざ","こころあ","ありあ","あさぼらけあ","やまが","ひさ","たれ","ひとは","なつ","しら","わすら","あさぢ","しの","こひ","ちぎりき","あひ","あふ","あはれ","ゆら","やへ","かぜを","みかき","きみがためを","かく","あけ","なげき","わすれ","たき","あらざ","め","ありま","やす","おほえ","いに","よを","いまは","あさぼらけう","うら","もろ","はるの","こころに","あらし","さ","ゆふ","おと","たか","うか","ちぎりお","わたのはらこ","せ","あはぢ","あきか","ながか","ほ","おも","よのなかよ","ながら","よも","なげけ","む","なにはえ","たま","みせ","きり","わがそ","よのなかは","みよ","おほけ","はなさ","こぬ","かぜそ","ひとも","もも"]
 
 		$(function(){
-			
 			$('#myForm').submit(function(e){
-			// 	e.preventDefault();
 				ques.json.emit('quesSet',{
 					msg: $('#msg').val(),
 					name: $('#name').val(),
 					room: $('#rooms').val()
 				});
-			// 	$('#msg').val('').focus();
 			});
 			var ques = io.connect('http://localhost:1337/ques');
 			ques.on('quesSet',function(data){
@@ -56,20 +53,12 @@
 				quesSet = data.quesSet;
 				quesOrder = data.quesOrder;
 
-				// alert(quesSet[5]);
-				// var point1 = 0;
-				// var point2 = 0;
-				// var qNum = 0 ;
 				$('#ques').append('<div>第'+(qNum+1)+'問　'+kimariji[quesOrder[qNum]-1]+'</div>');
 				for(var i = 1 ; i <= 30;i++){
-				// $('#ques').append('<div style="float:left;">'+i+'.'+kimariji[quesOrder[i-1]-1]+'</div>');
-				// $('#ans').append('<div>'+kimariji[quesSet[i-1]-1]+'</div>');
+
 				$('#ans').append('<img style="float:left;" class="on" id="'+quesSet[i-1]+'"src="common/img/'+quesSet[i-1]+'.png">');
 				}
-
 			});
-		
-
 
 			var chat = io.connect('http://localhost:1337/chat');
 			// var news = io.connect('http://localhost:1337/news');
@@ -84,50 +73,56 @@
 			});
 			
 			chat.on('emit_from_server',function(data){
-				console.log(data);
+				// console.log(data);
 				$('#logs').append($('<li>').text(data));
 			});
 			chat.on('room',function(data){
 				$('#room').text('Room : '+ data.room);
 			});
-	
-
-			
-
 		});
 
-		$(document).on('click', 'img', function(){
+		var judge = io.connect('http://localhost:1337/judge');
+
+
+		var bool;
+		judge.on('judge',function(data){
+			
+			// alert('hasha');
+			qNum = data.qNum;
+			point1 = data.point1;
+			point2 = data.point2;
+			bool = data.bool;
+
+			// alert('p1: '+point1+'  p2: '+point2+'  qNum: '+qNum+'  bool: '+bool);
+			$('#point1').text('あなたの得点:'+point1+'点  ');
+			$('#point2').text('相手の得点:'+point2+'点  ');
+			if(bool){
+				// alert(bool);
+				$(this).css("opacity","0");
+				$(this).removeClass('on');						
+				$('#ques').empty();
+				$('#ques').append('<div>第'+(qNum+1)+'問  '+kimariji[quesOrder[qNum]-1]+'</div>');
+			}
+		});
+
+		$(document).on('click','img', function(){
+				// var clickedImage = $(this);
 				
 				if($(this).hasClass('on')) {
 					var id = $(this).attr("id");
-					// alert(id+'  '+quesOrder[qNum]);
-					if(String(quesOrder[qNum]) === id){
-						// TO DO サーバーサイドでid判定
-						
-						point1 ++;
-						qNum ++;
-						$('#point1').text('あなたの得点:'+point1+'点  ');
-						$('#point2').text('相手の得点:'+point2+'点  ');
-						$(this).css("opacity","0");
-						$(this).removeClass('on');
-						
-						$('#ques').empty();
-						$('#ques').append('<div>第'+(qNum+1)+'問'+kimariji[quesOrder[qNum]-1]+'</div>');
+					//OK alert('haha');
+					
+					// TO DO サーバーサイドでid判定
+					//id qNumを送信
+					
 
-					}else{
-						// alert(id);
-						// TO DO お手つき
-						point2 ++;
-						// qNum ++;
-						$('#point1').text('あなたの得点:'+point1+'点  ');
-						$('#point2').text('相手の得点:'+point2+'点  ');
-						// $(this).css("opacity","0");
-						// $(this).removeClass('on');
-						
-						$('#ques').empty();
-						$('#ques').append('<div>第'+(qNum+1)+'問'+kimariji[quesOrder[qNum]-1]+'</div>');
+					judge.json.emit('judge',{
+						qNum: qNum,
+						id: id
+						// name: $('#name').val()
+					});
 
-					}
+
 				}
 				
 			});

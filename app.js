@@ -15,10 +15,6 @@ var mime = {
 };
 
 app.listen(1337);
-// io.set('log level',1);
-// var express = require('express');
-// var app2 = express();
-// app2.use(express.static(__dirname));
 function handler(req,res){
 
 
@@ -85,8 +81,13 @@ function handler(req,res){
 		    quesOrder[n] = quesOrder[j];
 		    quesOrder[j] = t;
 		}
-		
-		// var point1 = 0;
+		var point1 = 0;
+		var point2 = 0;
+		var qNum = 0 ;
+		var bool =false;
+
+
+
 //問題送信
 var ques = io.of('/ques').on('connection', function(socket){
 	socket.on('quesSet', function(data){
@@ -99,7 +100,8 @@ var ques = io.of('/ques').on('connection', function(socket){
 
 		socket.json.emit('quesSet',{
 					quesSet: quesSet,
-					quesOrder: quesOrder
+					quesOrder: quesOrder,
+					qNum:qNum,
 				});
 		// socket.client_name = data.name;
         // io.to(data.room).emit('ques', '[' + data.name + '] : ' + data.msg);
@@ -107,9 +109,46 @@ var ques = io.of('/ques').on('connection', function(socket){
 	});
 });
 
-//ふだid受信
-//正解orお手つき
-//結果送信
+//ふだid受信 //正解orお手つき //結果送信
+var judge = io.of('/judge').on('connection', function(socket){
+
+	socket.on('judge', function(data){
+		
+		qNum = data.qNum;
+		id = data.id;
+		// var palyer = data.name;
+		
+		if(String(quesOrder[qNum]) === id){
+			point1 ++;
+			qNum ++;
+			bool = true;
+
+		}else{
+			
+			point2 ++;
+			bool = false;
+		}
+
+		socket.json.emit('judge',{
+					qNum: qNum,
+					point1: point1,
+					point2: point2,
+					bool: bool
+		});
+		socket.json.broadcast.emit('judge',{
+					qNum: qNum,
+					point1: point2,
+					point2: point1,
+					bool: bool
+		});
+
+		
+		socket.client_name = data.name;
+        io.to(data.room).emit('id', '[' + data.name + '] : ' + data.msg);
+		
+	});
+});
+
 
 
 var chat = io.of('/chat').on('connection', function(socket){
