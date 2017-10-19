@@ -131,12 +131,14 @@ var judge = io.of('/judge').on('connection', function(socket){
 
 		socket.json.emit('judge',{
 					qNum: qNum,
+					id: id,
 					point1: point1,
 					point2: point2,
 					bool: bool
 		});
 		socket.json.broadcast.emit('judge',{
 					qNum: qNum,
+					id: id,
 					point1: point2,
 					point2: point1,
 					bool: bool
