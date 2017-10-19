@@ -38,126 +38,15 @@
 
 	<script>
 		$(function(){
-			var chat = io.connect('http://localhost:1337/chat');
-			// var news = io.connect('http://localhost:1337/news');
-			$('#myForm').submit(function(e){
-				e.preventDefault();
-				chat.json.emit('emit_from_client',{
-					msg: $('#msg').val(),
-					name: $('#name').val(),
-					room: $('#rooms').val()
-				});
-				$('#msg').val('').focus();
-			});
+			var quesSet = []; 
+			var quesOrder = []; 
+
+			var kimariji = ["あきの","はるす","あし","たご","おく","かさ","あまの","わがい","はなの","これ","わたのはらや","あまつ","つく","みちの","きみがためは","たち","ちは","す","なにはが","わび","いまこ","ふ","つき","この","なにし","をぐ","みかの","やまざ","こころあ","ありあ","あさぼらけあ","やまが","ひさ","たれ","ひとは","なつ","しら","わすら","あさぢ","しの","こひ","ちぎりき","あひ","あふ","あはれ","ゆら","やへ","かぜを","みかき","きみがためを","かく","あけ","なげき","わすれ","たき","あらざ","め","ありま","やす","おほえ","いに","よを","いまは","あさぼらけう","うら","もろ","はるの","こころに","あらし","さ","ゆふ","おと","たか","うか","ちぎりお","わたのはらこ","せ","あはぢ","あきか","ながか","ほ","おも","よのなかよ","ながら","よも","なげけ","む","なにはえ","たま","みせ","きり","わがそ","よのなかは","みよ","おほけ","はなさ","こぬ","かぜそ","ひとも","もも"]
+
 			
-			chat.on('emit_from_server',function(data){
-				console.log(data);
-				$('#logs').append($('<li>').text(data));
-			});
-			chat.on('room',function(data){
-				$('#room').text('Room : '+ data.room);
-			});
-			// news.on('emit_from_server',function(data){
-			// 	$('#news').text(data);
-			// });
-		});
-	</script>
-	
-	<script type="text/javascript">  // サーバーサイド（仮）
-
-	// ゲーム準備準備--------------------------------------------------------
-		
-	// ①出題する問題を決定する（n問）
-
-		//百首をランダムに並べる-------------------------------------　ここから
-		var tmpQuesSet = [];	//tmpQuesSet[札の並び順] = 歌番号
-		for(var i=1; i<=100; i++){
-			tmpQuesSet.push(i);
-		}
-		var a = tmpQuesSet.length;
-		 
-		//シャッフルアルゴリズム
-		while (a) {
-		    var j = Math.floor( Math.random() * a );
-		    var t = tmpQuesSet[--a];
-		    tmpQuesSet[a] = tmpQuesSet[j];
-		    tmpQuesSet[j] = t;
-		}
-		//百首をランダムに並べる-------------------------------------　ここまで
+			// var news = io.connect('http://localhost:1337/news');
 
 
-		//quesSet作成---------------------------------------------　ここから
-		var quesSet =[]; //quesSet[札の並び順(画面上)] = 歌番号 
-		var n = 30;   //出題数
-		for(var i=0; i<n; i++){
-			quesSet.push(tmpQuesSet[i]);  //tmpQuesSetの前から問題数分を代入
-		}
-		//quesSet作成---------------------------------------------　ここまで
-		
-
-	// ②出題する順番を決定する
-		var quesOrder = []; //quesOrder[問題番号] = 歌番号
-		for(var i=0; i<quesSet.length; i++){
-			quesOrder.push(quesSet[i]);  //tmpQuesSetの前から問題数分を代入
-		}
-
-		//シャッフルアルゴリズム
-		while (n) {
-		    var j = Math.floor( Math.random() * n );
-		    var t = quesOrder[--n];
-		    quesOrder[n] = quesOrder[j];
-		    quesOrder[j] = t;
-		}
-		
-		// var point1 = 0;
-
-
-
-		// TO DO webAPIから百人一首の情報を受け取る------------------
-		// $(function() {
-		//   // ［検索］ボタンクリックで郵便番号検索を実行
-		//     $.getJSON('http://api.aoikujira.com/hyakunin/get.php?/callback=?')
-		//     {
-  		//  	 fmt: JSON
-  		// 	},
-		//     // 結果を取得したら…
-		//     .done(function(data) {
-		//       // 中身が空でなければ、その値を［住所］欄に反映
-		//       var items = data.iems;
-		//       if (items) {
-		//         // var result = data;
-		//         $('#ans').append('<div>'+items.kami +'</div>');
-		//       // 中身が空の場合は、エラーメッセージを反映
-		//       } else {s
-		//         $('#ans').val('該当する住所が存在しません。');
-		//       }
-		//     });
-		// });
-		// TO DO webAPIから百人一首の情報を受け取る------------------ここまで
-
-		var kimariji = ["あきの","はるす","あし","たご","おく","かさ","あまの","わがい","はなの","これ","わたのはらや","あまつ","つく","みちの","きみがためは","たち","ちは","す","なにはが","わび","いまこ","ふ","つき","この","なにし","をぐ","みかの","やまざ","こころあ","ありあ","あさぼらけあ","やまが","ひさ","たれ","ひとは","なつ","しら","わすら","あさぢ","しの","こひ","ちぎりき","あひ","あふ","あはれ","ゆら","やへ","かぜを","みかき","きみがためを","かく","あけ","なげき","わすれ","たき","あらざ","め","ありま","やす","おほえ","いに","よを","いまは","あさぼらけう","うら","もろ","はるの","こころに","あらし","さ","ゆふ","おと","たか","うか","ちぎりお","わたのはらこ","せ","あはぢ","あきか","ながか","ほ","おも","よのなかよ","ながら","よも","なげけ","む","なにはえ","たま","みせ","きり","わがそ","よのなかは","みよ","おほけ","はなさ","こぬ","かぜそ","ひとも","もも"]
-
-
-		// ゲーム準備準備--------------------------------------------------------ここまで
-
-		//どっちが取ったか判定----------------------------------------------------ここから
-
-
-		//どっちが取ったか判定----------------------------------------------------ここまで
-
-	</script>
-
-	<script type="text/javascript">
-		$(function(){
-			var point1 = 0;
-			var point2 = 0;
-			var qNum = 0 ;
-			$('#ques').append('<div>第'+(qNum+1)+'問　'+kimariji[quesOrder[qNum]-1]+'</div>');
-			for(var i = 1 ; i <= 30;i++){
-				// $('#ques').append('<div style="float:left;">'+i+'.'+kimariji[quesOrder[i-1]-1]+'</div>');
-				// $('#ans').append('<div>'+kimariji[quesSet[i-1]-1]+'</div>');
-				$('#ans').append('<img style="float:left;" class="on" id="'+quesSet[i-1]+'"src="common/img/'+quesSet[i-1]+'.png">');
-			}
 			$("img").click(function(){
 				if($(this).hasClass('on')) {
 					var id = $(this).attr("id");
@@ -194,9 +83,65 @@
 				}
 				
 			})
-		})
+
+
+			
+			$('#myForm').submit(function(e){
+			// 	e.preventDefault();
+				ques.json.emit('quesSet',{
+					msg: $('#msg').val(),
+					name: $('#name').val(),
+					room: $('#rooms').val()
+				});
+			// 	$('#msg').val('').focus();
+			});
+			var ques = io.connect('http://localhost:1337/ques');
+			ques.on('quesSet',function(data){
+				alert('quesSet: '+data.quesSet+'  quesOrder: '+data.quesOrder+'quesSet[5]: '+data.quesSet[5]);
+				quesSet = data.quesSet;
+				quesOrder = data.quesOrder;
+
+				alert(quesSet[5]);
+				var point1 = 0;
+				var point2 = 0;
+				var qNum = 0 ;
+				$('#ques').append('<div>第'+(qNum+1)+'問　'+kimariji[quesOrder[qNum]-1]+'</div>');
+				for(var i = 1 ; i <= 30;i++){
+				// $('#ques').append('<div style="float:left;">'+i+'.'+kimariji[quesOrder[i-1]-1]+'</div>');
+				// $('#ans').append('<div>'+kimariji[quesSet[i-1]-1]+'</div>');
+				$('#ans').append('<img style="float:left;" class="on" id="'+quesSet[i-1]+'"src="common/img/'+quesSet[i-1]+'.png">');
+				}
+
+			});
+			// ques.on('room',function(data){
+			// 	$('#room').text('Room : '+ data.room);
+			// });
+
+
+			var chat = io.connect('http://localhost:1337/chat');
+			// var news = io.connect('http://localhost:1337/news');
+			$('#myForm').submit(function(e){
+				e.preventDefault();
+				chat.json.emit('emit_from_client',{
+					msg: $('#msg').val(),
+					name: $('#name').val(),
+					room: $('#rooms').val()
+				});
+				$('#msg').val('').focus();
+			});
+			
+			chat.on('emit_from_server',function(data){
+				console.log(data);
+				$('#logs').append($('<li>').text(data));
+			});
+			chat.on('room',function(data){
+				$('#room').text('Room : '+ data.room);
+			});
+			// news.on('emit_from_server',function(data){
+			// 	$('#news').text(data);
+			// });
+		});
 	</script>
-
-
+	
 </body>
 </html>

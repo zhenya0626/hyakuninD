@@ -41,7 +41,71 @@ function handler(req,res){
 }
 
 //問題生成
+
+// ゲーム準備準備--------------------------------------------------------
+		
+	// ①出題する問題を決定する（n問）
+
+		//百首をランダムに並べる-------------------------------------　ここから
+		var tmpQuesSet = [];	//tmpQuesSet[札の並び順] = 歌番号
+		for(var i=1; i<=100; i++){
+			tmpQuesSet.push(i);
+		}
+		var a = tmpQuesSet.length;
+		 
+		//シャッフルアルゴリズム
+		while (a) {
+		    var j = Math.floor( Math.random() * a );
+		    var t = tmpQuesSet[--a];
+		    tmpQuesSet[a] = tmpQuesSet[j];
+		    tmpQuesSet[j] = t;
+		}
+		//百首をランダムに並べる-------------------------------------　ここまで
+
+
+		//quesSet作成---------------------------------------------　ここから
+		var quesSet =[]; //quesSet[札の並び順(画面上)] = 歌番号 
+		var n = 30;   //出題数
+		for(var i=0; i<n; i++){
+			quesSet.push(tmpQuesSet[i]);  //tmpQuesSetの前から問題数分を代入
+		}
+		//quesSet作成---------------------------------------------　ここまで
+		
+
+	// ②出題する順番を決定する
+		var quesOrder = []; //quesOrder[問題番号] = 歌番号
+		for(var i=0; i<quesSet.length; i++){
+			quesOrder.push(quesSet[i]);  //tmpQuesSetの前から問題数分を代入
+		}
+
+		//シャッフルアルゴリズム
+		while (n) {
+		    var j = Math.floor( Math.random() * n );
+		    var t = quesOrder[--n];
+		    quesOrder[n] = quesOrder[j];
+		    quesOrder[j] = t;
+		}
+		
+		// var point1 = 0;
 //問題送信
+var ques = io.of('/ques').on('connection', function(socket){
+	socket.on('quesSet', function(data){
+
+		socket.join(data.room);
+		// socket.emit('ques','you are in' + data.room);
+		// socket.emit('ques', '[' + data.name + '] : ' + data.msg);
+		// socket.broadcast.to(data.room).emit('ques', '[' + data.name + '] : ' + data.msg);
+
+
+		socket.json.emit('quesSet',{
+					quesSet: quesSet,
+					quesOrder: quesOrder
+				});
+		// socket.client_name = data.name;
+        // io.to(data.room).emit('ques', '[' + data.name + '] : ' + data.msg);
+		
+	});
+});
 
 //ふだid受信
 //正解orお手つき
