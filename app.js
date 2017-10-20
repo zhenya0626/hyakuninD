@@ -1,8 +1,4 @@
 
-
-
-
-
 var app = require('http').createServer(handler),
 	io = require('socket.io').listen(app),
 	fs = require('fs');
@@ -14,7 +10,7 @@ var mime = {
   // 読み取りたいMIMEタイプはここに追記
 };
 
-app.listen(1337);
+app.listen(process.env.PORT || 8080);
 function handler(req,res){
 
 
