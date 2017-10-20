@@ -11,4 +11,7 @@
   "dependencies": {
     "socket.io": "^2.0.3"
   }
+  "script":{
+        "start":"node app.js"
+  }
 }
